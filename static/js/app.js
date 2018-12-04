@@ -9,41 +9,25 @@ function buildMetadata(sample) {
   const metaDataPromise = d3.json(url);
   console.log(`Metadata Pending Promise: `, metaDataPromise);
 
-  var testArr = ['Blah', 'Blah', 'Piglet'];
-
-  d3.selectAll('#sample-metadata').enter()
-    .data(testArr)
-    .text(words => {
-      words
-    });
-    // .html('')
-    // .append('p')
+  // Remove any existing html 'p' tags from previous data
+  d3.select('#sample-metadata').selectAll('p').remove();
   
-    metaDataPromise.then(data => {
-      Object.entries(data).forEach(([key, value]) => {
-        // .append('li')
-        `${key}: ${value}`
-        console.log(`building metadata: ${key}: ${value}`);
-      });
+  metaDataPromise.then(data => {
+    // empty list to hold the key value pairs of the meta data object as single strings
+    var metaDataStr = [];
+    Object.entries(data).forEach(([key, value]) => {
+      metaDataStr.push(`${key.toUpperCase()}: ${value}`);
     });
 
-    // Clear existing data
-    // selection.remove();
-
-    // {"AGE":24.0,"BBTYPE":"I","ETHNICITY":"Caucasian","GENDER":"F","LOCATION":"Beaufort/NC","WFREQ":2.0,"sample":940}
-
-    // selection.enter()
-    //   .html(d => {
-    //     `<ul><li>${d.AGE}</li><li>${d.BBTYPE}</li></ul>`
-    //   });
- 
-    // Use d3 to select the panel with id of `#sample-metadata`
-
-    // Use `.html("") to clear any existing metadata
-
-    // Use `Object.entries` to add each key and value pair to the panel
-    // Hint: Inside the loop, you will need to use d3 to append new
-    // tags for each key-value in the metadata.
+    d3.select('#sample-metadata')
+      .selectAll('p')
+      .data(metaDataStr)
+      .enter()
+      .append('p')
+      .text(d => {
+        return(d);
+      })
+  });
 
     // BONUS: Build the Gauge Chart
     // buildGauge(data.WFREQ);
@@ -93,6 +77,7 @@ function buildCharts(sample) {
     // HINT: You will need to use slice() to grab the top 10 sample_values,
     // otu_ids, and labels (10 each).
     d3.json(url).then((response) => {
+      // Sort the by sample_values. However, 'response.sort()' doesn't work, so my next solution is quite convoluted. Here we go...
 
       // Define variable for sample values
       var allValues = response.sample_values;
@@ -143,7 +128,7 @@ function buildCharts(sample) {
       };
 
       var layout = {
-        title: 'First 10 Belly Button Bacteria Samples',
+        title: 'Top 10 Belly Button Bacteria Samples',
         showlegend: false
       };
 
