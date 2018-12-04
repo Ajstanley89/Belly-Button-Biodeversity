@@ -13,12 +13,15 @@ function buildMetadata(sample) {
   d3.select('#sample-metadata').selectAll('p').remove();
   
   metaDataPromise.then(data => {
-    // empty list to hold the key value pairs of the meta data object as single strings
+    // empty list to hold the key value pairs of the metadata object as single strings
     var metaDataStr = [];
+
+    // use object.entries and foorEach to populate the empty list with the concatenated metadata strings
     Object.entries(data).forEach(([key, value]) => {
       metaDataStr.push(`${key.toUpperCase()}: ${value}`);
     });
 
+    // dynamically update the sample metadata div with the required info
     d3.select('#sample-metadata')
       .selectAll('p')
       .data(metaDataStr)
@@ -74,8 +77,6 @@ function buildCharts(sample) {
 
 
     // @TODO: Build a Pie Chart
-    // HINT: You will need to use slice() to grab the top 10 sample_values,
-    // otu_ids, and labels (10 each).
     d3.json(url).then((response) => {
       // Sort the by sample_values. However, 'response.sort()' doesn't work, so my next solution is quite convoluted. Here we go...
 
@@ -85,11 +86,8 @@ function buildCharts(sample) {
       // Empty list to hold index and value pairs
       var valueAndIndex = [];
 
-      // loop through sample values and pair each value with its index
-      for (var i = 0; i < allValues.length; i++) {
-        var pair = [allValues[i], i];
-        valueAndIndex.push(pair);
-      }
+      // Use .map to get the values and the original index from the smaple values
+      valueAndIndex = allValues.map((value, index) => [value, index]);
 
       // sort valueAndIndex by the value (index 0), retaining the original index
       var sorted = valueAndIndex.sort((a,b) => b[0] - a[0]);
@@ -98,26 +96,23 @@ function buildCharts(sample) {
       var topTenValuesIndex = sorted.slice(0,10);
       console.log(topTenValuesIndex);
 
-      // define variables to hold just the values
+      // define empty lists to hold just the toop ten values/labels/ids
       var topTenValues = [];
       var topTenLabels = [];
       var topTenIds = [];
 
-      // Loop through the top ten list to extract just the top sample values, and match the labels and ids with the correct index. I feel like this is a hella janky way to do this, and there must be a more streamlined solution, but I can't figure it out.
-      for (var j = 0; j < topTenValuesIndex.length; j++) {
-        // variable for the sample value and original index pair
-        var pair = topTenValuesIndex[j];
+      // Use .map to iterate through each value-original_index pair in topTenValuesIndex list and use the original index to get the correct labels and ids. I feel like this is a hella janky way to do this, and there must be a more streamlined solution, but I can't figure it out.
+      topTenValuesIndex.map(pair => {
         var topIndex = pair[1];
         topTenValues.push(pair[0]);
         topTenLabels.push(response.otu_labels[topIndex]);
         topTenIds.push(response.otu_ids[topIndex]);
-      }
+      })
 
       // verify in console
       console.log(`Sorted data: ${topTenValues}`);
       console.log(`Top Ten labels: ${topTenLabels}`);
       console.log(`Ids: ${topTenIds}`);
-
 
       // Take the top 10 results for the data, labels, and hoverinfo
       var trace1 = { 
