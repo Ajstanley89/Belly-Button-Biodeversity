@@ -78,7 +78,7 @@ function buildMetadata(sample) {
         {
           values: gaugeSections,
           rotation: 90,
-          text: ['Hella Clean', 'Very Clean', 'Kinda Clean', 'Almost Dirty', 'Neither', 'Almost Clean', 'Kinda Dirty', 'Very Dirty', 'Hella Dirty', ''],
+          text: ['Hella Clean', 'Very Clean', 'Kinda Clean', 'Almost Clean', 'Medium Cleanliness', 'Almost Dirty', 'Kinda Dirty', 'Very Dirty', 'Hella Dirty', ''],
           textinfo: 'text',
           textposition: 'inside',
           marker: {
