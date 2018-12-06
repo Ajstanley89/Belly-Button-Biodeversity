@@ -30,10 +30,105 @@ function buildMetadata(sample) {
       .text(d => {
         return(d);
       })
-  });
 
-    // BONUS: Build the Gauge Chart
-    // buildGauge(data.WFREQ);
+    function buildGauge (response) {
+      // The level of the needle is based off response.wfreq
+      var wfreq = response.WFREQ;
+      console.log(`Washing freq: ${wfreq}`);
+
+      //0 is on the left of the chart, so we need to flip 180 deg to make low values on the right
+      var deg = 180 - (180*wfreq/9),
+            radius = 0.5;
+      // Convert deg to radians
+      var rad = deg * Math.PI/180;
+      // Convert polar coordinates to cartesian
+      var x = radius * Math.cos(rad);
+      var y = radius * Math.sin(rad);
+
+      // Define path for the needle triangle
+      var mainPath = 'M -.0 -.025 L .0 0.025 L ',
+            pathX = String(x),
+            space = ' ',
+            pathY = String(y),
+            pathEnd = ' Z';
+      var path = mainPath.concat(pathX,space,pathY,pathEnd);
+
+      // Define variable for gauge sections
+      var numSections = 9;
+      var gaugeSections = [];
+
+      // For loop to populate array with n values of 50/n
+      for (var i=0; i<numSections; i++) {
+        gaugeSections.push(50/numSections);
+      }
+
+      // Add 50 to end of the array
+      gaugeSections.push(50);
+
+      var data = [
+        { type: 'scatter',
+          x: [0], 
+          y: [0],
+          marker: { size: 28, color:'850000'},
+          showlegend: false,
+          name: 'Times per Week',
+          text: wfreq,
+          hoverinfo: 'text+name'
+        },
+        {
+          values: gaugeSections,
+          rotation: 90,
+          text: ['Hella Clean', 'Very Clean', 'Kinda Clean', 'Almost Dirty', 'Neither', 'Almost Clean', 'Kinda Dirty', 'Very Dirty', 'Hella Dirty', ''],
+          textinfo: 'text',
+          textposition: 'inside',
+          marker: {
+            colors: [
+              'rgba(14, 127, 0, .5)', 
+              'rgba(110, 154, 22, .5)',
+              'rgba(140, 170, 32, .5)', // new
+              'rgba(170, 202, 42, .5)', 
+              'rgba(190, 205, 62, .5)', // new
+              'rgba(202, 209, 95, .5)',
+              'rgba(210, 206, 145, .5)', 
+              'rgba(222, 210, 180, .5)', // new
+              'rgba(232, 226, 202, .5)',
+              'rgba(255, 255, 255, 0)'
+            ]
+          },
+          labels: ['8-9', '7-8', '6-7', '5-6', '4-5', '3-4', '2-3', '1-2', '0-1', ''],
+          hoverinfo: 'label',
+          hole: 0.5,
+          type: 'pie',
+          showlegend: false
+        }];
+      var layout = {
+        shapes: [{
+          type: 'path',
+          path: path,
+          fillcolor: '850000',
+          line: {
+            color: '850000'
+          }
+        }],
+        title: 'Belly Button <br> Weekly Washing Frequency',
+        height: 500,
+        width: 500,
+        xaxis: {
+          zeroline: false,
+          showticklabels: false,
+          showgrid: false,
+          range: [-1, 1]},
+        yaxis: {
+          zeroline: false,
+          showticklabels: false,
+          showgrid: false,
+          range: [-1, 1]},
+      };
+
+      Plotly.newPlot('gauge', data, layout);
+      }
+      buildGauge(data);
+  });
 }
 
 function buildCharts(sample) {
